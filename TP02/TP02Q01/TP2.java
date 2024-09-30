@@ -1,4 +1,4 @@
-package TP02.TP02Q01;
+
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
