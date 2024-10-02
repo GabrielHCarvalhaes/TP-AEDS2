@@ -1,3 +1,4 @@
+package TP02;
 
 
 import java.io.BufferedReader;
@@ -164,7 +165,7 @@ class Pokemon{
         this.captureRate = Integer.parseInt(splitPt3[3]);
         if(splitPt3[4].equals("0"))this.isLegendary = false;
         else this.isLegendary = true;
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");   
         this.captureDate = sdf.parse(splitPt3[5]);
     }
 
@@ -172,8 +173,10 @@ class Pokemon{
         
         System.out.print("[#" + getId() + " -> "+getName() + ": " + getDescription() + " - ");
         if(type.size() == 2)System.out.print("['"+type.get(0)+"', '"+type.get(1)+"'] - ");
-        else System.out.print("['"+type.get(0)+"] - ");
-        System.out.println("["+abilities.get(0)+"] - " + getWeight()+"kg - " + getHeight() + "m - " + getCaptureRate() + "% - " + getIsLegendary() + " - " + getGeneration() + " gen] - "+getCaptureDate());
+        else System.out.print("['"+type.get(0)+"'] - ");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String data= sdf.format(getCaptureDate());
+        System.out.println(abilities.get(0)+" - " + getWeight()+"kg - " + getHeight() + "m - " + getCaptureRate() + "% - " + getIsLegendary() + " - " + getGeneration() + " gen] - "+data);
     }
 
 }
