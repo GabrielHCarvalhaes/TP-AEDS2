@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TP2",
+            "request": "launch",
+            "mainClass": "TP02.Q03.TP2",
+            "projectName": "TP-AEDS2_4dd467a6"
+        },
+        {
+            "type": "java",
             "name": "Palindromo",
             "request": "launch",
             "mainClass": "Palindromo",

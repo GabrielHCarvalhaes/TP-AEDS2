@@ -1,5 +1,4 @@
-package TP02;
-
+package TP02.Q03;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -99,13 +98,13 @@ class Pokemon{
         this.generation = 0;
         this.name = "";
         this.description = "";
-        this.type = new ArrayList<>(); // Inicializa como lista vazia
-        this.abilities = new ArrayList<>(); // Inicializa como lista vazia
+        this.type = new ArrayList<>(); 
+        this.abilities = new ArrayList<>(); 
         this.weight = 0.0;
         this.height = 0.0;
         this.captureRate = 0;
         this.isLegendary = false;
-        this.captureDate = new Date(); // Data atual por padrão
+        this.captureDate = new Date(); 
     }
 
     // Construtor com parâmetros
@@ -179,12 +178,14 @@ class Pokemon{
         System.out.println(abilities.get(0)+" - " + getWeight()+"kg - " + getHeight() + "m - " + getCaptureRate() + "% - " + getIsLegendary() + " - " + getGeneration() + " gen] - "+data);
     }
 
+
 }
 
 public class TP2{
 
     public static void main(String[] args) throws IOException, ParseException {
         
+        long startTime=System.currentTimeMillis();
         FileInputStream fstream = new FileInputStream("/tmp/pokemon.csv");
         BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
         Scanner sc = new Scanner(System.in);
@@ -192,6 +193,7 @@ public class TP2{
 
         String input = br.readLine();
         Pokemon[] pokemons = new Pokemon[801];
+        List<Integer>ids= new ArrayList<>(); 
 
         input = br.readLine();
         while(input != null){
@@ -204,10 +206,38 @@ public class TP2{
 
         input = sc.nextLine();
         while(!(input.equals("FIM"))){
-            pokemons[Integer.parseInt(input)-1].print();
+            ids.add(Integer.parseInt(input)-1);
+            //pokemons[Integer.parseInt(input)-1].print();
             input = sc.nextLine();
         }
 
+        List<String>names= new ArrayList<>();
+        input = sc.nextLine();
+        while(!(input.equals("FIM"))){
+            names.add(input);
+            input = sc.nextLine();      
+        }
+        int numComparisons=0;
+        boolean existe;
+        for(int i=0 ; i<names.size(); i++){
+            existe=false;
+            for(int j=0; j<ids.size() && existe != true;j++ ){
+                numComparisons++;
+                if(names.get(i).equals(pokemons[ids.get(j)].getName())){
+                    existe=true;
+                }
+            }
+            if (existe) {
+                System.out.println("SIM");
+            }else{
+                System.out.println("NAO");
+            }
+        }
+        long endTime = System.currentTimeMillis();
+        long executionTime= endTime - startTime;
+
+        System.out.println("Tempo de execução: " + executionTime + " ms");
+        System.out.println("Número de comparações: " + numComparisons);
     }
 
 }

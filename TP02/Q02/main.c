@@ -28,17 +28,17 @@ Data stringParaData(char *str) {
 }
 
 typedef struct Pokemon {
-    int codigo;
-    int geracao;
-    char *nome;
-    char *descricao;
-    char tipos[2][50];
-    char habilidades[6][50];
-    double peso;
-    double altura;
-    int taxaCaptura;
-    bool ehLendario;
-    Data dataCaptura;
+    int id;
+    int generation;
+    char *name;
+    char *description;
+    char type[2][50];
+    char abilities[6][50];
+    double weight;
+    double height;
+    int captureRate;
+    bool isLegendary;
+    Data captureDate;
 } Pokemon;
 
 char* duplicarString(const char* s) {
@@ -50,45 +50,45 @@ char* duplicarString(const char* s) {
 }
 
 int obterCodigo(Pokemon *p) {
-    return p->codigo;
+    return p->id;
 }
 
-void definirCodigo(Pokemon *p, int codigo) {
-    p->codigo = codigo;
+void definirCodigo(Pokemon *p, int id) {
+    p->id = id;
 }
 
 int obterGeracao(Pokemon *p) {
-    return p->geracao;
+    return p->generation;
 }
 
-void definirGeracao(Pokemon *p, int geracao) {
-    p->geracao = geracao;
+void definirGeracao(Pokemon *p, int generation) {
+    p->generation = generation;
 }
 
 char* obterNome(Pokemon *p) {
-    return p->nome;
+    return p->name;
 }
 
-void definirNome(Pokemon *p, char *nome) {
-    p->nome = nome;
+void definirNome(Pokemon *p, char *name) {
+    p->name = name;
 }
 
 char* obterDescricao(Pokemon *p) {
-    return p->descricao;
+    return p->description;
 }
 
-void definirDescricao(Pokemon *p, char *descricao) {
-    p->descricao = descricao;
+void definirDescricao(Pokemon *p, char *description) {
+    p->description = description;
 }
 
 char* obterTipos(Pokemon *p, int indice) {
-    return p->tipos[indice];
+    return p->type[indice];
 }
 
 int obterNumeroDeTipos(Pokemon *p) {
     int contador = 0;
     for (int i = 0; i < 2; i++) {
-        if (strlen(p->tipos[i]) > 0) {
+        if (strlen(p->type[i]) > 0) {
             contador++;
         }
     }
@@ -96,18 +96,18 @@ int obterNumeroDeTipos(Pokemon *p) {
 }
 
 void definirTipos(Pokemon *p, int indice, char *tipo) {
-    strncpy(p->tipos[indice], tipo, sizeof(p->tipos[indice]) - 1);
-    p->tipos[indice][sizeof(p->tipos[indice]) - 1] = '\0';
+    strncpy(p->type[indice], tipo, sizeof(p->type[indice]) - 1);
+    p->type[indice][sizeof(p->type[indice]) - 1] = '\0';
 }
 
 char* obterHabilidades(Pokemon *p, int indice) {
-    return p->habilidades[indice];
+    return p->abilities[indice];
 }
 
 int obterNumeroDeHabilidades(Pokemon *p) {
     int contador = 0;
     for (int i = 0; i < 6; i++) {
-        if (strlen(p->habilidades[i]) > 0) {
+        if (strlen(p->abilities[i]) > 0) {
             contador++;
         }
     }
@@ -115,52 +115,52 @@ int obterNumeroDeHabilidades(Pokemon *p) {
 }
 
 void definirHabilidades(Pokemon *p, int indice, const char *habilidade) {
-    strncpy(p->habilidades[indice], habilidade, sizeof(p->habilidades[indice]) - 1);
-    p->habilidades[indice][sizeof(p->habilidades[indice]) - 1] = '\0';
+    strncpy(p->abilities[indice], habilidade, sizeof(p->abilities[indice]) - 1);
+    p->abilities[indice][sizeof(p->abilities[indice]) - 1] = '\0';
 }
 
 double obterPeso(Pokemon *p) {
-    return p->peso;
+    return p->weight;
 }
 
-void definirPeso(Pokemon *p, double peso) {
-    p->peso = peso;
+void definirPeso(Pokemon *p, double weight) {
+    p->weight = weight;
 }
 
 double obterAltura(Pokemon *p) {
-    return p->altura;
+    return p->height;
 }
 
-void definirAltura(Pokemon *p, double altura) {
-    p->altura = altura;
+void definirAltura(Pokemon *p, double height) {
+    p->height = height;
 }
 
 int obterTaxaCaptura(Pokemon *p) {
-    return p->taxaCaptura;
+    return p->captureRate;
 }
 
-void definirTaxaCaptura(Pokemon *p, int taxaCaptura) {
-    p->taxaCaptura = taxaCaptura;
+void definirTaxaCaptura(Pokemon *p, int captureRate) {
+    p->captureRate = captureRate;
 }
 
 bool obterEhLendario(Pokemon *p) {
-    return p->ehLendario;
+    return p->isLegendary;
 }
 
-void definirEhLendario(Pokemon *p, bool ehLendario) {
-    p->ehLendario = ehLendario;
+void definirEhLendario(Pokemon *p, bool isLegendary) {
+    p->isLegendary = isLegendary;
 }
 
 Data obterDataCaptura(Pokemon *p) {
-    return p->dataCaptura;
+    return p->captureDate;
 }
 
-void definirDataCapturaData(Pokemon *p, Data dataCaptura) {
-    p->dataCaptura = dataCaptura;
+void definirDataCapturaData(Pokemon *p, Data captureDate) {
+    p->captureDate = captureDate;
 }
 
 void definirDataCapturaString(Pokemon *p, char *dataCaptura) {
-    p->dataCaptura = stringParaData(dataCaptura);
+    p->captureDate = stringParaData(dataCaptura);
 }
 
 Pokemon criarPokemon(int codigo, int geracao, char *nome,
@@ -187,7 +187,7 @@ Pokemon criarPokemon(int codigo, int geracao, char *nome,
         if (habilidades[i] != NULL) {
             definirHabilidades(&p, i, habilidades[i]);
         } else {
-            strcpy(p.habilidades[i], "");
+            strcpy(p.abilities[i], "");
         }
     }
 
@@ -237,19 +237,19 @@ void lerPokemons(FILE *file, Pokemon *pokedex, int *n) {
         char *campos[12];
         int contadorCampos = separar_linha_csv(linha, campos, 12);
 
-        p.codigo = atoi(campos[0]);
+        p.id = atoi(campos[0]);
 
-        p.geracao = atoi(campos[1]);
+        p.generation = atoi(campos[1]);
 
-        p.nome = duplicarString(campos[2]);
+        p.name = duplicarString(campos[2]);
 
-        p.descricao = duplicarString(campos[3]);
+        p.description = duplicarString(campos[3]);
         
         definirTipos(&p, 0, campos[4]);
         if (strlen(campos[5]) > 0) {
             definirTipos(&p, 1, campos[5]);
         } else {
-            strcpy(p.tipos[1], "");
+            strcpy(p.type[1], "");
         }
 
         char *campoHabilidades = campos[6];
@@ -278,18 +278,18 @@ void lerPokemons(FILE *file, Pokemon *pokedex, int *n) {
             }
         }
         for (; indiceHabilidade < 6; indiceHabilidade++) {
-            strcpy(p.habilidades[indiceHabilidade], "");
+            strcpy(p.abilities[indiceHabilidade], "");
         }
 
-        p.peso = atof(campos[7]);
+        p.weight = atof(campos[7]);
 
-        p.altura = atof(campos[8]);
+        p.height = atof(campos[8]);
 
-        p.taxaCaptura = atoi(campos[9]);
+        p.captureRate = atoi(campos[9]);
 
-        p.ehLendario = atoi(campos[10]);
+        p.isLegendary = atoi(campos[10]);
 
-        p.dataCaptura = stringParaData(campos[11]);
+        p.captureDate = stringParaData(campos[11]);
         
         pokedex[*n] = p;
         (*n)++;
@@ -351,7 +351,7 @@ int main () {
         int codigo = atoi(idEntrada);
         bool encontrado = false;
         for (int i = 0 ; i < n ; i++) {
-            if (pokedex[i].codigo == codigo) {
+            if (pokedex[i].id == codigo) {
                 exibirPokemon(&pokedex[i]);
                 encontrado = true;
                 break;
@@ -362,8 +362,8 @@ int main () {
     }
 
     for (int i = 0; i < n; i++) {
-        free(pokedex[i].nome);
-        free(pokedex[i].descricao);
+        free(pokedex[i].name);
+        free(pokedex[i].description);
     }
 
     return 0;
