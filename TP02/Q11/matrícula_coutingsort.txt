@@ -1,0 +1,1 @@
+matricula: 856201 \t tempo de execução:  \t número de comparações
