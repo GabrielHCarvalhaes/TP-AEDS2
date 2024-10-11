@@ -5,12 +5,7 @@
 
 #define MAX_POKEMONS 801
 #define MAX_SELECTED 801
-
-typedef struct {
-    int dia;
-    int mes;
-    int ano;
-} Data;
+#define K 10  // Tamanho da ordenação parcial
 
 typedef struct {
     int id;
@@ -28,7 +23,7 @@ typedef struct {
 } Pokemon;
 
 Pokemon pokemons[MAX_POKEMONS];
-Pokemon selectedPokemons[MAX_SELECTED]; // Array para os Pokémons selecionados
+int selectedIds[MAX_SELECTED]; // Array para IDs dos Pokémons selecionados
 int selectedCount = 0; // Contador de Pokémons selecionados
 
 // Função para extrair a substring contendo a data do Pokémon
@@ -41,7 +36,6 @@ void substring(const char* original, char* data, int length) {
 void preencherPokedex() {
     FILE *file = fopen("/tmp/pokemon.csv", "r");
     if (file == NULL) {
-        printf("Erro ao abrir o arquivo.\n");
         return;
     }
 
@@ -81,7 +75,6 @@ void preencherPokedex() {
 
         char *tok2 = strtok(segundaParte, ",");
         pokemons[i].weight = (tok2 && strlen(tok2) > 0) ? strtod(tok2, NULL) : 0;
-
         tok2 = strtok(NULL, ",");
         pokemons[i].height = (tok2 && strlen(tok2) > 0) ? strtod(tok2, NULL) : 0;
 
@@ -99,64 +92,80 @@ void preencherPokedex() {
     fclose(file);
 }
 
-// Função para comparar dois Pokémons pelo nome (usada para ordenação)
-int compararPokemons(const void *a, const void *b) {
-    Pokemon *pokemonA = (Pokemon *)a;
-    Pokemon *pokemonB = (Pokemon *)b;
-    return strcmp(pokemonA->name, pokemonB->name);
-}
-
-// Função de busca binária para verificar se o nome do Pokémon está entre os selecionados
-bool binarySearch(char* target) {
-    int left = 0;
-    int right = selectedCount - 1;
-
-    while (left <= right) {
-        int mid = left + (right - left) / 2;
-        int cmp = strcmp(selectedPokemons[mid].name, target);
-
-        if (cmp == 0) {
-            return true; // Nome encontrado
-        } else if (cmp < 0) {
-            left = mid + 1; // Pesquisa na metade superior
-        } else {
-            right = mid - 1; // Pesquisa na metade inferior
+// Função para ler IDs dos Pokémons selecionados
+void leiaIds() {
+    char str[10];
+    while (scanf("%s", str) && strcmp(str, "FIM") != 0) {
+        int id = atoi(str) - 1; // Ajusta o índice
+        if (id >= 0 && id < MAX_POKEMONS) {
+            selectedIds[selectedCount++] = id; // Adiciona o ID selecionado
         }
     }
-    return false; 
 }
 
-// Função para verificar se um Pokémon existe entre os selecionados
-void verificarPokemon(char *nome) {
-    if (binarySearch(nome)) {
-        printf("SIM\n");
-    } else {
-        printf("NAO\n");
+// Função para comparar datas no formato "dd/mm/aaaa"
+int compareDates(const char *date1, const char *date2) {
+    int d1, m1, a1;
+    int d2, m2, a2;
+
+    sscanf(date1, "%d/%d/%d", &d1, &m1, &a1);
+    sscanf(date2, "%d/%d/%d", &d2, &m2, &a2);
+
+    if (a1 != a2) return a1 - a2;  // Comparar anos
+    if (m1 != m2) return m1 - m2;  // Comparar meses
+    return d1 - d2;                // Comparar dias
+}
+
+// Função para realizar a ordenação parcial por inserção
+void insertionSortPartial(int *ids) {
+    int limit = selectedCount < K ? selectedCount : K; // Limite para a ordenação
+
+    for (int i = 1; i < limit; i++) {
+        int key = ids[i];
+        int j = i - 1;
+
+        // Ordenar pelo captureDate e em caso de empate pelo nome
+        while (j >= 0 && (compareDates(pokemons[ids[j]].captureDate, pokemons[key].captureDate) > 0 ||
+            (compareDates(pokemons[ids[j]].captureDate, pokemons[key].captureDate) == 0 &&
+             strcmp(pokemons[ids[j]].name, pokemons[key].name) > 0))) {
+            ids[j + 1] = ids[j];
+            j--;
+        }
+        ids[j + 1] = key;
+    }
+}
+
+// Função para imprimir os Pokémons selecionados
+void imprimirPokemons(int *idsOrd) {
+    for (int i = 0; i < 10; i++) {
+        Pokemon *p = &pokemons[idsOrd[i]];
+        if (strcmp(p->type2, "0") != 0) {
+            printf("[#%d -> %s: %s - ['%s', '%s'] - %s - %.1fkg - %.1fm - %d%% - %s - %d gen] - %s\n",
+                p->id, p->name, p->description, p->type1, p->type2, p->abilities,
+                p->weight, p->height, p->captureRate, p->isLegendary ? "true" : "false", p->generation,
+                p->captureDate);
+        } else {
+            printf("[#%d -> %s: %s - ['%s'] - %s - %.1fkg - %.1fm - %d%% - %s - %d gen] - %s\n",
+                p->id, p->name, p->description, p->type1, p->abilities,
+                p->weight, p->height, p->captureRate, p->isLegendary ? "true" : "false", p->generation,
+                p->captureDate); 
+        }
     }
 }
 
 int main() {
     preencherPokedex();
+    int idOrd[MAX_SELECTED];
 
-    // Receber IDs dos Pokémons
-    char str[10];
-    while (scanf("%s", str) && strcmp(str, "FIM") != 0) {
-        int id = atoi(str);
-        for (int i = 0; i < MAX_POKEMONS; i++) {
-            if (pokemons[i].id == id) {
-                selectedPokemons[selectedCount++] = pokemons[i]; // Adiciona o Pokémon selecionado
-                break;
-            }
-        }
-    }
+    leiaIds(); // Lê os IDs dos Pokémons selecionados
 
-    // Ordenar o array de Pokémon selecionados para que a busca binária funcione corretamente
-    qsort(selectedPokemons, selectedCount, sizeof(Pokemon), compararPokemons);
+    // Copia os IDs para ordenação
+    memcpy(idOrd, selectedIds, selectedCount * sizeof(int)); 
 
-    // Receber nomes de Pokémons e verificar sua existência
-    while (scanf("%s", str) && strcmp(str, "FIM") != 0) {
-        verificarPokemon(str);
-    }
+    // Ordena os IDs usando Insertion Sort Parcial
+    insertionSortPartial(idOrd);
+
+    imprimirPokemons(idOrd); // Imprime os Pokémons selecionados
 
     // Liberar a memória alocada
     for (int i = 0; i < MAX_POKEMONS; i++) {
