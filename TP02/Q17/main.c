@@ -330,37 +330,50 @@ void exibirPokemon(Pokemon *p) {
     printf("\n");
 }
 
-int compararDatas(Data data1, Data data2) {
-    if (data1.ano < data2.ano) {
+int compararPokemon(Pokemon *a, Pokemon *b) {
+    if (a->altura < b->altura) {
         return -1;
-    } else if (data1.ano > data2.ano) {
+    } else if (a->altura > b->altura) {
         return 1;
     } else {
-        if (data1.mes < data2.mes) {
-            return -1;
-        } else if (data1.mes > data2.mes) {
-            return 1;
-        } else {
-            return data1.dia - data2.dia;
-        }
+        return strcmp(a->nome, b->nome);
     }
 }
 
-void insertion(Pokemon *array[], int n) {
-    for (int i = 1; i < n; i++) {
-        Pokemon *chave = array[i];
-        int j = i - 1;
+void heapify(Pokemon *array[], int n, int i) {
+    int maior = i;
+    int esquerda = 2 * i + 1;
+    int direita = 2 * i + 2;
 
-        while (j >= 0 && 
-               (compararDatas(chave->dataCaptura, array[j]->dataCaptura) < 0 ||
-                (compararDatas(chave->dataCaptura, array[j]->dataCaptura) == 0 &&
-                 strcmp(chave->nome, array[j]->nome) < 0))) {
-            array[j + 1] = array[j];
-            j--;
-        }
-        array[j + 1] = chave;
+    if (esquerda < n && compararPokemon(array[esquerda], array[maior]) > 0)
+        maior = esquerda;
+
+    if (direita < n && compararPokemon(array[direita], array[maior]) > 0)
+        maior = direita;
+
+    if (maior != i) {
+        Pokemon *temp = array[i];
+        array[i] = array[maior];
+        array[maior] = temp;
+
+        heapify(array, n, maior);
     }
 }
+
+void heapSort(Pokemon *array[], int n) {
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        heapify(array, n, i);
+    }
+
+    for (int i = n - 1; i > 0; i--) {
+        Pokemon *temp = array[0];
+        array[0] = array[i];
+        array[i] = temp;
+
+        heapify(array, i, 0);
+    }
+}
+
 
 int main() {
     char *caminhoCSV = "/tmp/pokemon.csv";
@@ -402,7 +415,7 @@ int main() {
         scanf("%s", idEntrada);
     }
 
-    insertion(pokemonsParaOrdenar, contadorIds);
+    heapSort(pokemonsParaOrdenar, contadorIds);
 
     for (int i = 0; i < 10; i++) {
         exibirPokemon(pokemonsParaOrdenar[i]);
