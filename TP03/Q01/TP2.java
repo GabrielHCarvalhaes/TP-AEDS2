@@ -1,4 +1,3 @@
-package TP02.Q01;
 
 
 import java.io.BufferedReader;
@@ -7,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -91,6 +91,12 @@ class Pokemon{
     }
     public void setWeight(double weight) {
         this.weight = weight;
+    }
+
+    public Pokemon clonar(){
+
+        return new Pokemon(id, generation, name, description, type, abilities, weight, height, captureRate, isLegendary, captureDate);
+
     }
 
     public Pokemon(){
@@ -179,49 +185,124 @@ class Pokemon{
         System.out.println(abilities.get(0)+" - " + getWeight()+"kg - " + getHeight() + "m - " + getCaptureRate() + "% - " + getIsLegendary() + " - " + getGeneration() + " gen] - "+data);
     }
 
+    public String ToString(List<String> lista){
+        return String.join(",", lista);
+    }
+    public String toStringTypes(List<String> lista){
+        
+        if(lista.get(1) != null){
+
+            return "['" + lista.get(0) + "', '" + lista.get(1) + "']";
+
+        }else{
+
+            return "['" + lista.get(0) + "']";
+
+        }
+
+    }
+
 }
 
 public class TP2{
 
     public static void main(String[] args) throws IOException, ParseException {
-        
+    
         FileInputStream fstream = new FileInputStream("/tmp/pokemon.csv");
         BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
         Scanner sc = new Scanner(System.in);
         int count = 0;
-
+    
         String input = br.readLine();
         Pokemon[] pokemons = new Pokemon[801];
-
-        //leitura da pasta csv
+    
+        // Leitura da pasta CSV
         input = br.readLine();
-        while(input != null){
+        while (input != null) {
             Pokemon tmp = new Pokemon();
             tmp.read(input);
             pokemons[count] = tmp;
             count++;
             input = br.readLine();
         }
-
+    
         input = sc.nextLine();
-        while(!(input.equals("FIM"))){
-            pokemons[Integer.parseInt(input)-1].print();
+        Lista pokemonsLista = new Lista();
+        while (!input.equals("FIM")) {
+            try {
+                pokemonsLista.inserirInicio(pokemons[Integer.parseInt(input) - 1]);
+            } catch (Exception e) {
+                System.out.println("Erro ao inserir Pokémon: " + e.getMessage());
+            }
             input = sc.nextLine();
         }
-
+        
+        int interacoes;
+        input = sc.nextLine();
+        interacoes = Integer.parseInt(input);
+        for (int i = 0; i < interacoes; i++) {
+            input = sc.nextLine();
+            String[] op = input.split(" ");
+            Pokemon temp = new Pokemon();
+            switch (op[0]) {
+                case "II":
+                    try {
+                        pokemonsLista.inserirInicio(pokemons[Integer.parseInt(op[1]) - 1].clonar());
+                    } catch (Exception e) {
+                        System.out.println("Erro ao inserir Pokémon no início: " + e.getMessage());
+                    }
+                    break;
+                case "IF":
+                    try {
+                        pokemonsLista.inserirFim(pokemons[Integer.parseInt(op[1]) - 1].clonar());
+                    } catch (Exception e) {
+                        System.out.println("Erro ao inserir Pokémon no fim: " + e.getMessage());
+                    }
+                    break;
+                case "RI":
+                    try {
+                        temp = pokemonsLista.removerInicio();
+                        System.out.println("(R) " + temp.getName());
+                    } catch (Exception e) {
+                        System.out.println("Erro ao remover do início: " + e.getMessage());
+                    }
+                    break;
+                case "RF":
+                    try {
+                        temp = pokemonsLista.removerFim();
+                        System.out.println("(R) " + temp.getName());
+                    } catch (Exception e) {
+                        System.out.println("Erro ao remover do fim: " + e.getMessage());
+                    }
+                    break;
+                case "R*":
+                    try {
+                        temp = pokemonsLista.remover(Integer.parseInt(op[1])-1);
+                        System.out.println("(R) " + temp.getName());
+                    } catch (Exception e) {
+                        System.out.println("Erro ao remover na posição: " + e.getMessage());
+                    }
+                    break;
+            }
+        }
+    
+        pokemonsLista.mostrar();
+        sc.close();
+        br.close();
     }
+    
 
 }
 class Lista{
-    int[] array;
+    Pokemon[] array;
     int n;
-    Lista(){ this(6);}
+    Lista(){ this(801);}
     Lista(int tamanho){
-        array= new int[tamanho];
+        array= new Pokemon[tamanho];
         n= 0;
     }
 
-    void inserirInicio(int x)throws Exception{
+    void inserirInicio(Pokemon pokemon)throws Exception{
         if(n >= array.length)
             throw new Exception("Erro!");
 
@@ -230,22 +311,22 @@ class Lista{
             array[i] = array[i-1];
         }
 
-        array[0]= x;
+        array[0]= pokemon;
         n++;
     }
 
-    void inserirFim(int x)throws Exception {
+    void inserirFim(Pokemon pokemon)throws Exception {
 
-        if(n >= array.lenght)
-            throw new Exeception("Erro!");
+        if(n >= array.length)
+            throw new Exception("Erro!");
         
-        array[n]=x;
+        array[n]=pokemon;
         n++;
     }
 
-    void inserir(int x,int pos)throws Exception{
+    void inserir(Pokemon pokemon,int pos)throws Exception{
 
-        if(n >= array.lenght || pos < 0 || pos > n)
+        if(n >= array.length || pos < 0 || pos > n)
             throw new Exception("Erro!");
         
         //levar elemento para o fim do array
@@ -253,15 +334,15 @@ class Lista{
             array[i] = array[i-1];
         }
 
-        array[pos]=x;
+        array[pos]=pokemon;
         n++;
     }
 
-    int removerInicio() throws Exception {
+    Pokemon removerInicio() throws Exception {
         if (n == 0) 
             throw new Exception("Erro!");
 
-        int resp = array[0];
+        Pokemon resp = array[0];
         n--;
 
         for(int i = 0;i < n;i++){
@@ -271,24 +352,35 @@ class Lista{
         return resp;
     }
 
-    int removerFim()throws Exception{
+    Pokemon removerFim()throws Exception{
         if(n==0)
             throw new Exception("Erro!");
         
         return array[--n];
     }
-    int remover(int pos)throws Exception{
+
+    Pokemon remover(int pos)throws Exception{
 
         if(n==0 || pos < 0 || pos >= n)
             throw new Exception("Erro!");
         
-        int resp = array[pos];
+        Pokemon resp = array[pos];
         n--;
 
         for(int i = pos; i < n; i++){
            array[i]= array[i+1]; 
         }
         
-        ret
+        return resp;
+    }
+
+    public void mostrar(){
+
+        for(int i = 0;i < n;i++){
+
+            System.out.print("[" + i + "] ");
+            array[i].print();
+        }
+
     }
 }
