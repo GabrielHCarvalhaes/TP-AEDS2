@@ -1,370 +1,284 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <stdlib.h>
+#include <time.h>
 
-typedef struct Data {
-    int dia;
-    int mes;
-    int ano;
-} Data;
+#define MAX_LINHA 160
+#define MAX_TAM 801
 
-char *dataParaString(Data data) {
-    char *str = (char *)malloc(11 * sizeof(char));
-    sprintf(str, "%02d/%02d/%04d", data.dia, data.mes, data.ano);
-    return str;
-}
-
-Data stringParaData(char *str) {
-    Data data;
-    if (str != NULL && strlen(str) > 0) {
-        sscanf(str, "%d/%d/%d", &data.dia, &data.mes, &data.ano);
-    } else {
-        data.dia = 0;
-        data.mes = 0;
-        data.ano = 0;
-    }
-    return data;
-}
-
-typedef struct Pokemon {
+typedef struct Pokemon
+{
     int id;
-    int generation;
-    char *name;
-    char *description;
-    char type[2][50];
-    char abilities[6][50];
-    double weight;
-    double height;
-    int captureRate;
-    bool isLegendary;
-    Data captureDate;
+    int geracao;
+    char* nome;
+    char* descricao;
+    char* tipo1;
+    char* tipo2;
+    char* habilidades;
+    double peso;
+    double altura;
+    int taxaCaptura;
+    bool lendario;
+    char* dataCaptura;
+
 } Pokemon;
 
-char* duplicarString(const char* s) {
-    char* copia = (char*)malloc(strlen(s) + 1);
-    if (copia != NULL) {
-        strcpy(copia, s);
-    }
-    return copia;
+Pokemon pokedex[MAX_TAM];
+
+void obterSubstring(const char *original, char *data, int comprimento) {
+    strncpy(data, original + (strlen(original) - 11), comprimento);
+    data[comprimento] = '\0';
 }
 
-int obterCodigo(Pokemon *p) {
-    return p->id;
-}
-
-void definirCodigo(Pokemon *p, int id) {
-    p->id = id;
-}
-
-int obterGeracao(Pokemon *p) {
-    return p->generation;
-}
-
-void definirGeracao(Pokemon *p, int generation) {
-    p->generation = generation;
-}
-
-char* obterNome(Pokemon *p) {
-    return p->name;
-}
-
-void definirNome(Pokemon *p, char *name) {
-    p->name = name;
-}
-
-char* obterDescricao(Pokemon *p) {
-    return p->description;
-}
-
-void definirDescricao(Pokemon *p, char *description) {
-    p->description = description;
-}
-
-char* obterTipos(Pokemon *p, int indice) {
-    return p->type[indice];
-}
-
-int obterNumeroDeTipos(Pokemon *p) {
-    int contador = 0;
-    for (int i = 0; i < 2; i++) {
-        if (strlen(p->type[i]) > 0) {
-            contador++;
-        }
-    }
-    return contador;
-}
-
-void definirTipos(Pokemon *p, int indice, char *tipo) {
-    strncpy(p->type[indice], tipo, sizeof(p->type[indice]) - 1);
-    p->type[indice][sizeof(p->type[indice]) - 1] = '\0';
-}
-
-char* obterHabilidades(Pokemon *p, int indice) {
-    return p->abilities[indice];
-}
-
-int obterNumeroDeHabilidades(Pokemon *p) {
-    int contador = 0;
-    for (int i = 0; i < 6; i++) {
-        if (strlen(p->abilities[i]) > 0) {
-            contador++;
-        }
-    }
-    return contador;
-}
-
-void definirHabilidades(Pokemon *p, int indice, const char *habilidade) {
-    strncpy(p->abilities[indice], habilidade, sizeof(p->abilities[indice]) - 1);
-    p->abilities[indice][sizeof(p->abilities[indice]) - 1] = '\0';
-}
-
-double obterPeso(Pokemon *p) {
-    return p->weight;
-}
-
-void definirPeso(Pokemon *p, double weight) {
-    p->weight = weight;
-}
-
-double obterAltura(Pokemon *p) {
-    return p->height;
-}
-
-void definirAltura(Pokemon *p, double height) {
-    p->height = height;
-}
-
-int obterTaxaCaptura(Pokemon *p) {
-    return p->captureRate;
-}
-
-void definirTaxaCaptura(Pokemon *p, int captureRate) {
-    p->captureRate = captureRate;
-}
-
-bool obterEhLendario(Pokemon *p) {
-    return p->isLegendary;
-}
-
-void definirEhLendario(Pokemon *p, bool isLegendary) {
-    p->isLegendary = isLegendary;
-}
-
-Data obterDataCaptura(Pokemon *p) {
-    return p->captureDate;
-}
-
-void definirDataCapturaData(Pokemon *p, Data captureDate) {
-    p->captureDate = captureDate;
-}
-
-void definirDataCapturaString(Pokemon *p, char *dataCaptura) {
-    p->captureDate = stringParaData(dataCaptura);
-}
-
-Pokemon criarPokemon(int codigo, int geracao, char *nome,
-    char *descricao, char *tipo1, char *tipo2, char *habilidades[6], double peso,
-    double altura, int taxaCaptura, bool ehLendario, Data dataCaptura) {
-
-    Pokemon p;
-
-    definirCodigo(&p, codigo);
-    definirGeracao(&p, geracao);
-
-    char *nomeCopia = duplicarString(nome);
-    char *descricaoCopia = duplicarString(descricao);
-
-    definirNome(&p, nomeCopia);
-    definirDescricao(&p, descricaoCopia);
-    
-    definirTipos(&p, 0, tipo1);
-    if (tipo2 != NULL) {
-        definirTipos(&p, 1, tipo2);
-    }
-
-    for (int i = 0; i < 6; i++) {
-        if (habilidades[i] != NULL) {
-            definirHabilidades(&p, i, habilidades[i]);
-        } else {
-            strcpy(p.abilities[i], "");
-        }
-    }
-
-    definirPeso(&p, peso);
-    definirAltura(&p, altura);
-    definirTaxaCaptura(&p, taxaCaptura);
-    definirEhLendario(&p, ehLendario);
-    definirDataCapturaData(&p, dataCaptura);
-
-    return p;
-}
-
-int separar_linha_csv(char *linha, char **campos, int max_campos) {
-    int contadorCampos = 0;
-    char *ptr = linha;
-    int dentro_aspas = 0;
-    char *inicioCampo = ptr;
-
-    while (*ptr && contadorCampos < max_campos) {
-        if (*ptr == '"') {
-            dentro_aspas = !dentro_aspas;
-        } else if (*ptr == ',' && !dentro_aspas) {
-            *ptr = '\0';
-            campos[contadorCampos++] = inicioCampo;
-            inicioCampo = ptr + 1;
-        }
-        ptr++;
-    }
-    if (contadorCampos < max_campos) {
-        campos[contadorCampos++] = inicioCampo;
-    }
-
-    return contadorCampos;
-}
-
-void lerPokemons(FILE *file, Pokemon *pokedex, int *n) {
-    char linha[1024];
-
-    fgets(linha, sizeof(linha), file);
-
-    while (fgets(linha, sizeof(linha), file) != NULL) {
-        linha[strcspn(linha, "\n")] = '\0';
-
-        Pokemon p;
-        memset(&p, 0, sizeof(Pokemon));
-
-        char *campos[12];
-        int contadorCampos = separar_linha_csv(linha, campos, 12);
-
-        p.id = atoi(campos[0]);
-
-        p.generation = atoi(campos[1]);
-
-        p.name = duplicarString(campos[2]);
-
-        p.description = duplicarString(campos[3]);
-        
-        definirTipos(&p, 0, campos[4]);
-        if (strlen(campos[5]) > 0) {
-            definirTipos(&p, 1, campos[5]);
-        } else {
-            strcpy(p.type[1], "");
-        }
-
-        char *campoHabilidades = campos[6];
-        if (campoHabilidades[0] == '"' && campoHabilidades[strlen(campoHabilidades) - 1] == '"') {
-            campoHabilidades[strlen(campoHabilidades) - 1] = '\0';
-            campoHabilidades++;
-        }
-        if (campoHabilidades[0] == '[' && campoHabilidades[strlen(campoHabilidades) - 1] == ']') {
-            campoHabilidades[strlen(campoHabilidades) - 1] = '\0';
-            campoHabilidades++;
-        }
-
-        char *tokenHabilidade;
-        char *restoHabilidades = campoHabilidades;
-        int indiceHabilidade = 0;
-        while ((tokenHabilidade = strtok_r(restoHabilidades, ",", &restoHabilidades)) && indiceHabilidade < 6) {
-            while (*tokenHabilidade == ' ' || *tokenHabilidade == '\'') tokenHabilidade++;
-            char *fimTemp = tokenHabilidade + strlen(tokenHabilidade) - 1;
-            while (fimTemp > tokenHabilidade && (*fimTemp == ' ' || *fimTemp == '\'')) {
-                *fimTemp = '\0';
-                fimTemp--;
-            }
-            if (strlen(tokenHabilidade) > 0) {
-                definirHabilidades(&p, indiceHabilidade, tokenHabilidade);
-                indiceHabilidade++;
-            }
-        }
-        for (; indiceHabilidade < 6; indiceHabilidade++) {
-            strcpy(p.abilities[indiceHabilidade], "");
-        }
-
-        p.weight = atof(campos[7]);
-
-        p.height = atof(campos[8]);
-
-        p.captureRate = atoi(campos[9]);
-
-        p.isLegendary = atoi(campos[10]);
-
-        p.captureDate = stringParaData(campos[11]);
-        
-        pokedex[*n] = p;
-        (*n)++;
-    }
-}
-
-void exibirPokemon(Pokemon *p) {
-    printf("[#%d -> %s: %s - ['", obterCodigo(p), obterNome(p), obterDescricao(p));
-
-    int numTipos = obterNumeroDeTipos(p);
-    if(numTipos > 0) {
-        printf("%s", obterTipos(p, 0));
-    }
-    if (numTipos > 1) {
-        printf("', '%s", obterTipos(p, 1));
-    }
-    printf("'] - ");
-
-    int numHabilidades = obterNumeroDeHabilidades(p);
-    printf("[");
-    for (int i = 0 ; i < numHabilidades ; i++) {
-        printf("'%s'", obterHabilidades(p, i));
-        if (i < numHabilidades - 1) {
-            printf(", ");
-        }
-    }
-    printf("] - ");
-
-    printf("%.1fkg - ", obterPeso(p));
-    printf("%.1fm - ", obterAltura(p));
-    printf("%d%% - ", obterTaxaCaptura(p));
-    printf("%s - ", obterEhLendario(p) ? "true" : "false");
-    printf("%d gen] - ", obterGeracao(p));
-    char *data = dataParaString(obterDataCaptura(p));
-    printf("%s", data);
-    free(data);
-
-    printf("\n");
-}
-
-int main () {
-    char *caminhoCSV = "/tmp/pokemon.csv";
-    FILE *arquivo = fopen(caminhoCSV, "r");   
-
+void preencherPokedex() {
+    FILE* arquivo = fopen("/tmp/pokemon.csv","r");
     if (arquivo == NULL) {
-        return 1;
-    } 
+        printf("Erro ao abrir o arquivo!\n");
+        return;
+    }
 
-    Pokemon pokedex[801];
-    int n = 0;
+    char linha[MAX_LINHA];
+    fgets(linha, MAX_LINHA, arquivo);
 
-    lerPokemons(arquivo, pokedex, &n);
+    int indice = 0;
+    while (fgets(linha, MAX_LINHA, arquivo) && indice < MAX_TAM) {
+        char data[13];
+        obterSubstring(linha, data, 12);
+        
+        char* token1 = strtok(linha, "\"");
+        char* primeiraParte = token1;
+        char* token2 = strtok(NULL, "\"");
+        char* habilidades = token2 ? strdup(token2) : NULL;
+        char* token3 = strtok(NULL, "\"");
+        char* segundaParte = token3;
+
+        char* tok = strtok(primeiraParte, ",");
+        pokedex[indice].id = atoi(tok);
+
+        tok = strtok(NULL, ",");
+        pokedex[indice].geracao = atoi(tok);
+
+        tok = strtok(NULL, ",");
+        pokedex[indice].nome = strdup(tok ? tok : "");
+
+        tok = strtok(NULL, ",");
+        pokedex[indice].descricao = strdup(tok ? tok : "");
+
+        tok = strtok(NULL, ",");
+        pokedex[indice].tipo1 = strdup(tok ? tok : "");
+
+        tok = strtok(NULL, ",");
+        pokedex[indice].tipo2 = (tok && strlen(tok) > 0) ? strdup(tok) : strdup("0");
+
+        pokedex[indice].habilidades = habilidades ? habilidades : strdup("");
+
+        char* tok2 = strtok(segundaParte, ",");
+        pokedex[indice].peso = (tok2 && strlen(tok2) > 0) ? strtod(tok2, NULL) : 0;
+
+        tok2 = strtok(NULL, ",");
+        pokedex[indice].altura = (tok2 && strlen(tok2) > 0) ? strtod(tok2, NULL) : 0;
+
+        tok2 = strtok(NULL, ",");
+        pokedex[indice].taxaCaptura = atoi(tok2);
+
+        tok2 = strtok(NULL, ",");
+        pokedex[indice].lendario = (tok2 && atoi(tok2) != 0);
+
+        tok2 = strtok(NULL, ",");
+        pokedex[indice].dataCaptura = strdup(data);
+
+        if (pokedex[indice].id == 19) {
+            pokedex[indice].peso = 0.0;
+            pokedex[indice].altura = 0.0;
+            pokedex[indice].taxaCaptura = 255;
+        }
+
+        indice++;
+    }
 
     fclose(arquivo);
+}
 
-    char idEntrada[10];
-    scanf("%s", idEntrada);
-    while (strcmp(idEntrada, "FIM") != 0) {
-        int codigo = atoi(idEntrada);
-        bool encontrado = false;
-        for (int i = 0 ; i < n ; i++) {
-            if (pokedex[i].id == codigo) {
-                exibirPokemon(&pokedex[i]);
-                encontrado = true;
-                break;
-            }
+char* tratarTipos(Pokemon monstro) {
+    char* resultado = (char*) malloc(MAX_LINHA * sizeof(char));
+    
+    if (strcmp(monstro.tipo2, "0") == 0) {
+        sprintf(resultado, "['%s']", monstro.tipo1);
+    } else {
+        sprintf(resultado, "['%s', '%s']", monstro.tipo1, monstro.tipo2);
+    }
+
+    return resultado;
+}
+
+char* tratarLendario(Pokemon monstro) {
+    return monstro.lendario ? "true" : "false";
+}
+
+char* toString(Pokemon monstro) {
+    char* resultado = (char*) malloc(MAX_LINHA * sizeof(char));
+    char* tipos = tratarTipos(monstro);
+    char* lendario = tratarLendario(monstro);
+
+    sprintf(resultado, "[#%d -> %s: %s - %s - %s - %.1lfkg - %.1lfm - %d%% - %s - %d gen] - %s",
+            monstro.id, monstro.nome, monstro.descricao, tipos, monstro.habilidades, 
+            monstro.peso, monstro.altura, monstro.taxaCaptura, lendario, 
+            monstro.geracao, monstro.dataCaptura);
+
+    return resultado;
+}
+
+bool isFim(char* str) {
+    return strcmp(str, "FIM") == 0;
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+Pokemon lista[MAX_TAM];
+int tamanhoLista;
+
+void iniciarLista() {
+    tamanhoLista = 0;
+}
+
+void inserirInicio(Pokemon monstro) {
+    if (tamanhoLista >= MAX_TAM) {
+        exit(1);
+    }
+
+    for (int i = tamanhoLista; i > 0; i--) {
+        lista[i] = lista[i - 1];
+    }
+
+    lista[0] = monstro;
+    tamanhoLista++;
+}
+
+void inserirFim(Pokemon monstro) {
+    if (tamanhoLista >= MAX_TAM) {
+        exit(1);
+    }
+
+    lista[tamanhoLista] = monstro;
+    tamanhoLista++;
+}
+
+void inserir(int pos, Pokemon monstro) {
+    if (tamanhoLista >= MAX_TAM || pos < 0 || pos > tamanhoLista) {
+        exit(1);
+    }
+
+    for (int i = tamanhoLista; i > pos; i--) {
+        lista[i] = lista[i - 1];
+    }
+
+    lista[pos] = monstro;
+    tamanhoLista++;
+}
+
+Pokemon removerInicio() {
+    if (tamanhoLista == 0) {
+        exit(1);
+    }
+
+    Pokemon resp = lista[0];
+    tamanhoLista--;
+
+    for (int i = 0; i < tamanhoLista; i++) {
+        lista[i] = lista[i + 1];
+    }
+
+    return resp;
+}
+
+Pokemon removerFim() {
+    if (tamanhoLista == 0) {
+        exit(1);
+    }
+
+    return lista[--tamanhoLista];
+}
+
+Pokemon remover(int pos) {
+    if (tamanhoLista == 0 || pos < 0 || pos >= tamanhoLista) {
+        exit(1);
+    }
+
+    Pokemon resp = lista[pos];
+    tamanhoLista--;
+
+    for (int i = pos; i < tamanhoLista; i++) {
+        lista[i] = lista[i + 1];
+    }
+
+    return resp;
+}
+
+void mostrar() {
+    for (int i = 0; i < tamanhoLista; i++) {
+        printf("[%d] %s", i, toString(lista[i]));
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+int main() {
+    preencherPokedex();
+    iniciarLista();
+
+    char* str = (char*) malloc(20 * sizeof(char));
+
+    do {
+        fgets(str, 20, stdin);
+        str[strcspn(str, "\n")] = 0;
+
+        if (!isFim(str)) {
+            int num = atoi(str);
+            inserirFim(pokedex[num - 1]);
         }
-        
-        scanf("%s", idEntrada); 
+    } while (!isFim(str));
+
+    int testes;
+    scanf("%d", &testes);
+    getchar();
+
+    for (int i = 0; i < testes; i++) {
+        fgets(str, 20, stdin);
+        str[strcspn(str, "\n")] = 0;
+
+        char* tok = strtok(str, " ");
+
+        if (strcmp(tok, "II") == 0) {
+            tok = strtok(NULL, " ");
+            int novo = atoi(tok);
+            inserirInicio(pokedex[novo - 1]);
+        } else if (strcmp(tok, "IF") == 0) {
+            tok = strtok(NULL, " ");
+            int novo = atoi(tok);
+            inserirFim(pokedex[novo - 1]);
+        } else if (strcmp(tok, "I*") == 0) {
+            tok = strtok(NULL, " ");
+            int pos = atoi(tok);
+            tok = strtok(NULL, " ");
+            int novo = atoi(tok);
+            inserir(pos, pokedex[novo - 1]);
+        } else if (strcmp(tok, "RI") == 0) {
+            Pokemon removido = removerInicio();
+            printf("(R) %s\n", removido.nome);
+        } else if (strcmp(tok, "RF") == 0) {
+            Pokemon removido = removerFim();
+            printf("(R) %s\n", removido.nome);
+        } else if (strcmp(tok, "R*") == 0) {
+            tok = strtok(NULL, " ");
+            int pos = atoi(tok);
+            Pokemon removido = remover(pos);
+            printf("(R) %s\n", removido.nome);
+        }
     }
 
-    for (int i = 0; i < n; i++) {
-        free(pokedex[i].name);
-        free(pokedex[i].description);
-    }
+    mostrar();
+    free(str);
 
     return 0;
 }
